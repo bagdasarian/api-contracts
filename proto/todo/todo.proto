@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+package checklist;
+
+option go_package = "github.com/yourname/api-contracts/gen/go;checklist";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+service TaskService {
+  // Создание новой задачи
+  rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse) {
+    option (google.api.http) = {
+      post: "/v1/tasks"
+      body: "*"
+    };
+  }
+  
+  // Получение списка задач с фильтрацией и пагинацией
+  rpc GetTasks(GetTasksRequest) returns (GetTasksResponse) {
+    option (google.api.http) = {
+      get: "/v1/tasks"
+    };
+  }
+  
+  // Удаление задачи по ID
+  rpc DeleteTask(DeleteTaskRequest) returns (DeleteTaskResponse) {
+    option (google.api.http) = {
+      delete: "/v1/tasks/{id}"
+    };
+  }
+  
+  // Отметка задачи как выполненной
+  rpc CompleteTask(CompleteTaskRequest) returns (CompleteTaskResponse) {
+    option (google.api.http) = {
+      put: "/v1/tasks/{id}/complete"
+    };
+  }
+
+  // Обновление задачи (заголовок, описание, статус)
+  rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse) {
+    option (google.api.http) = {
+      put: "/v1/tasks/{id}"
+      body: "*"
+    };
+  }
+}
+
+message CreateTaskRequest {
+  string title = 1;        
+  string description = 2;
+}
+
+message GetTasksRequest {
+  bool include_completed = 1;  // Включать выполненные задачи
+  int32 limit = 2;             // Лимит для пагинации
+  int32 offset = 3;            // Смещение для пагинации
+}
+
+message DeleteTaskRequest {
+  string id = 1;
+}
+
+message CompleteTaskRequest {
+  string id = 1;
+}
+
+message UpdateTaskRequest {
+  string id = 1;           
+  string title = 2;        
+  string description = 3;  
+  bool completed = 4;      
+}
+
+message CreateTaskResponse {
+  string id = 1;                           
+  string title = 2;                        
+  string description = 3;                  
+  bool completed = 4;                      
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp completed_at = 6;
+}
+
+message GetTasksResponse {
+  repeated Task tasks = 1; 
+  int32 total_count = 2;   // Общее количество задач
+}
+
+message DeleteTaskResponse {
+  bool success = 1;   
+  string message = 2; 
+}
+
+message CompleteTaskResponse {
+  string id = 1;
+  bool completed = 2;
+  google.protobuf.Timestamp completed_at = 3;
+}
+
+message UpdateTaskResponse {
+  Task task = 1;
+}
+
+message Task {
+  string id = 1;                           
+  string title = 2;                        
+  string description = 3;                  
+  bool completed = 4;                      
+  google.protobuf.Timestamp created_at = 5; 
+  google.protobuf.Timestamp completed_at = 6;
+}
