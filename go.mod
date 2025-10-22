@@ -1,4 +1,4 @@
-module api-contracts
+module github.com/bagdasarian/api-contracts
 
 go 1.24.1
 
